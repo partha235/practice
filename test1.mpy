@@ -1,0 +1,42 @@
+import dht
+import machine
+import time
+
+# Setup DHT11 sensor
+DHT_PIN = 14  # Change to your GPIO pin
+sensor = dht.DHT11(machine.Pin(DHT_PIN))
+
+# Filename to store data
+FILENAME = "senread.txt"
+
+# Function to read sensor and write data
+def log_sensor_data():
+    try:
+        sensor.measure()
+        temperature = sensor.temperature()
+        humidity = sensor.humidity()
+
+        # Format data
+        timestamp = time.localtime()
+        log_entry = "{}-{}-{} {}:{}:{} - Temp: {}°C, Humidity: {}%\n".format(
+            timestamp[0], timestamp[1], timestamp[2],  # Date
+            timestamp[3], timestamp[4], timestamp[5],  # Time
+            temperature, humidity
+        )
+
+        # Append data to file
+        with open(FILENAME, "a") as file:
+            file.write(log_entry)
+
+        print("Logged:", log_entry.strip())
+
+    except Exception as e:
+        print("Error reading sensor:", e)
+
+# Run five times a day (every ~5 hours)
+READ_INTERVAL = 5 * 60 * 60  # 5 hours in seconds
+READ_COUNT = 5
+
+for _ in range(READ_COUNT):
+    log_sensor_data()
+    time.sleep(READ_INTERVAL)
