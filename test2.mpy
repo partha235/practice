@@ -6,6 +6,8 @@ from machine import SoftI2C, Pin
 # **Setup DHT11 sensor**
 DHT_PIN = 14  # Change this to your GPIO pin
 dht_sensor = dht.DHT11(Pin(DHT_PIN))
+led=Pin(2,Pin.OUT)
+
 
 # **Setup BMP180 sensor (I2C)**
 I2C_SDA = 21  # Default ESP32 SDA
@@ -53,11 +55,13 @@ def log_sensor_data(day, reading):
 
 # **Loop for `NUM_DAYS`**
 for day in range(1, NUM_DAYS + 1):
+    led.value(1)
     print(f"\n--- Logging Data for Day-{day} ---")
     for reading in range(1, READINGS_PER_DAY + 1):
         log_sensor_data(day, reading)
         if reading < READINGS_PER_DAY:  # Avoid waiting after last reading of the day
             print(f"Waiting {READ_INTERVAL} seconds until next reading...\n")
+            led.value(1)
             time.sleep(READ_INTERVAL)  # Wait for the next reading
     print(f"--- Completed Day-{day}, waiting for next day ---\n")
     time.sleep(1)  # Short pause before starting the next day
